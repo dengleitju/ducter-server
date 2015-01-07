@@ -1,0 +1,171 @@
+package dcmd_api;
+option java_package = "com.cwinux.dcmd";
+
+enum DcmdMsgType {
+   MTYPE_AGENT_REPORT = 1; 
+   MTYPE_AGENT_REPORT_R = 2;
+   MTYPE_AGENT_HEATBEAT = 3;
+   MTYPE_CENTER_MASTER_NOTICE = 5;
+   MTYPE_CENTER_MASTER_NOTICE_R = 6;
+   MTYPE_CENTER_SUBTASK_CMD = 7;
+   MTYPE_CENTER_SUBTASK_CMD_R = 8;
+   MTYPE_AGENT_SUBTASK_PROCESS = 9;
+   MTYPE_AGENT_SUBTASK_CMD_RESULT = 11;
+   MTYPE_AGENT_SUBTASK_CMD_RESULT_R = 12;
+   MTYPE_CENTER_OPR_CMD = 13;
+   MTYPE_CENTER_OPR_CMD_R = 14;
+   MTYPE_CENTER_AGENT_SUBTASK_OUTPUT = 15;
+   MTYPE_CENTER_AGENT_SUBTASK_OUTPUT_R = 16;
+   MTYPE_CENTER_AGENT_RUNNING_TASK = 17;
+   MTYPE_CENTER_AGENT_RUNNING_TASK_R = 18;
+   MTYPE_CENTER_AGENT_RUNNING_OPR = 19;
+   MTYPE_CENTER_AGENT_RUNNING_OPR_R = 20;
+   MTYPE_UI_AGENT_SUBTASK_OUTPUT = 51;
+   MTYPE_UI_AGENT_SUBTASK_OUTPUT_R = 52;
+   MTYPE_UI_AGENT_RUNNING_SUBTASK = 53;
+   MTYPE_UI_AGENT_RUNNING_SUBTASK_R = 54;
+   MTYPE_UI_AGENT_RUNNING_OPR = 55;
+   MTYPE_UI_AGENT_RUNNING_OPR_R = 56;
+   MTYPE_UI_EXEC_OPR = 57;
+   MTYPE_UI_EXEC_OPR_R = 58;
+   MTYPE_UI_AGENT_INFO = 59;
+   MTYPE_UI_AGENT_INFO_R = 60;
+   MTYPE_UI_INVALID_AGENT = 61;
+   MTYPE_UI_INVALID_AGENT_R = 62;
+   MTYPE_UI_TASK_CMD_INFO = 63;
+   MTYPE_UI_TASK_CMD_INFO_R = 64;
+   MTYPE_UI_OPR_CMD_INFO = 65;
+   MTYPE_UI_OPR_CMD_INFO_R = 66;
+   MTYPE_UI_SUBTASK_PROCESS = 67;
+   MTYPE_UI_SUBTASK_PROCESS_R = 68;
+   MTYPE_UI_EXEC_TASK = 69;
+   MTYPE_UI_EXEC_TASK_R = 70;
+   MTYPE_UI_FETCH_AGENT_HOSTNAME = 71;
+   MTYPE_UI_FETCH_AGENT_HOSTNAME_R = 72;
+   MTYPE_UI_AUTH_INVALID_AGENT = 73;
+   MTYPE_UI_AUTH_INVALID_AGENT_R = 74;
+   MTYPE_INVALID_MTYPE = 101;
+   MTYPE_CENTER_INTERNAL_CONN = 103;
+   MTYPE_CENTER_INTERNAL_CONN_R = 104;
+}
+
+enum DcmdState {
+  DCMD_STATE_SUCCESS = 0;
+  DCMD_STATE_NO_MASTER = 1;
+  DCMD_STATE_WRONG_MASTER = 2;
+  DCMD_STATE_NO_TASK = 3;
+  DCMD_STATE_NO_SUBTASK = 4;
+  DCMD_STATE_HOST_LOST = 5;
+  DCMD_STATE_FAILED = 6;
+}
+
+enum  CmdType {
+   CMD_UNKNOWN = 0;
+   CMD_START_TASK = 1;
+   CMD_PAUSE_TASK = 2;
+   CMD_RESUME_TASK = 3;
+   CMD_RETRY_TASK = 4;
+   CMD_FINISH_TASK = 5;
+   CMD_ADD_NODE = 6;
+   CMD_CANCEL_SUBTASK=7;
+   CMD_CANCEL_SVR_SUBTASK=8;
+   CMD_DO_SUBTASK = 9;
+   CMD_REDO_TASK = 10;
+   CMD_REDO_SVR_POOL = 11;
+   CMD_REDO_SUBTASK = 12;
+   CMD_IGNORE_SUBTASK=13;
+   CMD_FREEZE_TASK=14;
+   CMD_UNFREEZE_TASK=15;
+   CMD_UPDATE_TASK = 16;
+   CMD_DEL_NODE = 17;
+}
+
+message KeyValue {
+  required  string   key = 1;
+  required  string   value= 2;
+}
+
+message SubTaskInfo {
+  required  string   svr_name=1;
+  required  string   svr_pool=2;
+  required  string   task_cmd=3;
+  required  string   task_id=4;
+  required  string   subtask_id=5;
+  required  string   cmd_id=6;
+}
+
+message OprInfo {
+  required  string     name=1;
+  required  string     start_time=2;
+  required  int32      running_second=3;
+}
+
+message SubTaskProcess {
+  required  string     subtask_id = 1;
+  optional  string     process = 2;
+}
+
+enum AgentState {
+  AGENT_UN_CONNECTED=0;
+  AGENT_UN_AUTH=1;
+  AGENT_UN_REPORTED=2;
+  AGENT_CONNECTED=3;
+}
+
+enum TaskState {
+   TASK_INIT = 0;
+   TASK_DOING = 1;
+   TASK_FAILED = 2;
+   TASK_FINISHED = 3;
+   TASK_FINISHED_WITH_FAILED = 4;
+}
+
+
+enum SubTaskState{
+   SUBTASK_INIT = 0;
+   SUBTASK_DOING = 1;
+   SUBTASK_FINISHED = 2;
+   SUBTASK_FAILED = 3;
+}
+
+enum CommandState {
+   COMMAND_DOING = 0;
+   COMMAND_SUCCESS = 1;
+   COMMAND_FAILED = 2;
+}
+
+message TaskInfo {
+  required  string      task_id=1;
+  required  TaskState   task_state=2;
+  required  string      depand_task_id = 3;
+  optional  string      depand_task_name = 4;
+  optional  bool        freezed=5;
+  optional  bool        valid=6;
+  optional  bool        pause=7;
+  optional  string      err=8;
+  optional  int32       success_subtask=9;
+  optional  int32       failed_subtask=10;
+  optional  int32       doing_subtask=11;
+  optional  int32       undo_subtask=12;
+  optional  int32       ignore_doing_subtask=13;
+  optional  int32       ignore_failed_subtask=14;
+}
+
+message AgentInfo {
+  required string     ip=1;
+  required AgentState state=2;
+  optional string     version=3;
+  optional string     connected_ip=4;
+  optional string     reported_ip=5;
+  optional string     hostname=6;
+}
+
+message AgentOprCmdReply {
+  required  DcmdState  state = 1;
+  required  string     result = 2;
+  required  string     err= 3; 
+  optional  string     ip=4;
+  optional  int32      status =5; 
+}
+
+

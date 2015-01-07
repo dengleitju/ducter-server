@@ -1,0 +1,11 @@
+#!/bin/sh
+proc_path = "/proc/""$DCMD_OPR_path"
+if [ -f $proc_path ]; then
+ cat $1
+elif [ -d $proc_path ]; then
+ ls -l $1
+else
+ echo "Doesn't exist."
+ exit 1
+fi
+exit 0

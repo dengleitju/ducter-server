@@ -1,0 +1,6 @@
+#!/bin/sh
+
+set|grep DCMD
+echo "process=100" >> "${DCMD_SVR_RESULT_FILE}"
+echo "state=success">>"${DCMD_SVR_RESULT_FILE}"
+echo "err=">>"${DCMD_SVR_RESULT_FILE}"

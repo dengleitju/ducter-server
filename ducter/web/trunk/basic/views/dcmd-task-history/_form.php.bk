@@ -1,0 +1,69 @@
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+
+/* @var $this yii\web\View */
+/* @var $model app\models\DcmdTaskHistory */
+/* @var $form yii\widgets\ActiveForm */
+?>
+
+<div class="dcmd-task-history-form">
+
+    <?php $form = ActiveForm::begin(); ?>
+
+    <?= $form->field($model, 'task_name')->textInput(['maxlength' => 128]) ?>
+
+    <?= $form->field($model, 'task_cmd')->textInput(['maxlength' => 64]) ?>
+
+    <?= $form->field($model, 'depend_task_id')->textInput() ?>
+
+    <?= $form->field($model, 'depend_task_name')->textInput(['maxlength' => 128]) ?>
+
+    <?= $form->field($model, 'svr_id')->textInput() ?>
+
+    <?= $form->field($model, 'svr_name')->textInput(['maxlength' => 128]) ?>
+
+    <?= $form->field($model, 'svr_path')->textInput(['maxlength' => 256]) ?>
+
+    <?= $form->field($model, 'tag')->textInput(['maxlength' => 128]) ?>
+
+    <?= $form->field($model, 'update_env')->textInput() ?>
+
+    <?= $form->field($model, 'update_tag')->textInput() ?>
+
+    <?= $form->field($model, 'state')->textInput() ?>
+
+    <?= $form->field($model, 'freeze')->textInput() ?>
+
+    <?= $form->field($model, 'valid')->textInput() ?>
+
+    <?= $form->field($model, 'pause')->textInput() ?>
+
+    <?= $form->field($model, 'err_msg')->textInput(['maxlength' => 512]) ?>
+
+    <?= $form->field($model, 'concurrent_rate')->textInput() ?>
+
+    <?= $form->field($model, 'timeout')->textInput() ?>
+
+    <?= $form->field($model, 'auto')->textInput() ?>
+
+    <?= $form->field($model, 'process')->textInput() ?>
+
+    <?= $form->field($model, 'task_arg')->textarea(['rows' => 6]) ?>
+
+    <?= $form->field($model, 'comment')->textInput(['maxlength' => 512]) ?>
+
+    <?= $form->field($model, 'utime')->textInput() ?>
+
+    <?= $form->field($model, 'ctime')->textInput() ?>
+
+    <?= $form->field($model, 'opr_uid')->textInput() ?>
+
+    <div class="form-group">
+        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+    </div>
+
+    <?php ActiveForm::end(); ?>
+
+</div>

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ -z "$DCMD_OPR_filter" ]; then
+  ps -ef
+else
+  ps -ef|grep "$DCMD_OPR_filter"
+fi
