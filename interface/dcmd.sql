@@ -996,8 +996,19 @@ INSERT INTO `dcmd_user` (`uid`, `username`, `passwd`, `sa`, `admin`, `depart_id`
 -- ----------------------------
 -- Records of dcmd_opr_cmd
 -- ----------------------------
-INSERT INTO `dcmd_opr_cmd` (`opr_cmd_id`, `opr_cmd`, `ui_name`, `run_user`, `script_md5`, `timeout`, `comment`, `utime`, `ctime`, `opr_uid`) VALUES ('1', 'host_user', 'get_host_user', 'sre', 'f4b5024642b198e66b8d27acec0bd09b', 20, '获取主机用户', '2014-02-20 15:55:05', '2014-02-20 15:55:05', 1);
-INSERT INTO `dcmd_opr_cmd` (`opr_cmd_id`, `opr_cmd`, `ui_name`, `run_user`, `script_md5`, `timeout`, `comment`, `utime`, `ctime`, `opr_uid`) VALUES ('2', 'os_info', 'os_info', 'sre', '78cd5d54bca0b4ee2c4c17a7c08f6759', 10, '获取主机信息', '2014-02-20 15:55:05', '2014-02-20 15:55:05', 1);
+INSERT INTO `dcmd_opr_cmd` (`opr_cmd_id`, `opr_cmd`, `ui_name`, `run_user`, `script_md5`, `timeout`, `comment`, `utime`, `ctime`, `opr_uid`) VALUES ('1', 'host_user', 'get_host_user', 'root', 'f4b5024642b198e66b8d27acec0bd09b', 20, '获取主机用户', '2014-02-20 15:55:05', '2014-02-20 15:55:05', 1);
+INSERT INTO `dcmd_opr_cmd` (`opr_cmd_id`, `opr_cmd`, `ui_name`, `run_user`, `script_md5`, `timeout`, `comment`, `utime`, `ctime`, `opr_uid`) VALUES ('2', 'os_info', 'os_info', 'root', '78cd5d54bca0b4ee2c4c17a7c08f6759', 10, '获取主机信息', '2014-02-20 15:55:05', '2014-02-20 15:55:05', 1);
+INSERT INTO `dcmd_opr_cmd` (`opr_cmd_id`, `opr_cmd`, `ui_name`, `run_user`, `script_md5`, `timeout`, `comment`, `utime`, `ctime`, `opr_uid`) VALUES ('3', 'proc_info', 'proc_info', 'root', '9a11445918e661dbb950ed0718f96ab2', 10, '获取进程信息', '2014-02-20 15:55:05', '2014-02-20 15:55:05', 1);
+INSERT INTO `dcmd_opr_cmd` (`opr_cmd_id`, `opr_cmd`, `ui_name`, `run_user`, `script_md5`, `timeout`, `comment`, `utime`, `ctime`, `opr_uid`) VALUES ('4', 'ps', 'ps', 'root', '522c8c25b28740b2aa2928672f4cd985', 10, 'ps', '2014-02-20 15:55:05', '2014-02-20 15:55:05', 1);
+INSERT INTO `dcmd_opr_cmd` (`opr_cmd_id`, `opr_cmd`, `ui_name`, `run_user`, `script_md5`, `timeout`, `comment`, `utime`, `ctime`, `opr_uid`) VALUES ('5', 'test_opr_env', 'test_opr_env', 'root', 'fe39937172b36ca82bcc9a824f1e259e', 10, '测试环境变量', '2014-02-20 15:55:05', '2014-02-20 15:55:05', 1);
+
+-- ---------------------------
+-- Records of dcmd_opr_cmd_repeat_exec
+-- ----------------------------
+INSERT INTO `dcmd_opr_cmd_repeat_exec` (`repeat_cmd_id`, `repeat_cmd_name`, `opr_cmd`, `run_user`, `timeout`, `ip`, `arg`, `cache_time`, `ip_mutable`, `arg_mutable`, `utime`, `ctime`, `opr_uid`)  VALUES ('1', 'os_info', 'os_info', 'root', 10, '', '', 1800, 1, 1, '2014-02-20 15:55:05', '2014-02-20 15:55:05', 1);
+INSERT INTO `dcmd_opr_cmd_repeat_exec` (`repeat_cmd_id`, `repeat_cmd_name`, `opr_cmd`, `run_user`, `timeout`, `ip`, `arg`, `cache_time`, `ip_mutable`, `arg_mutable`, `utime`, `ctime`, `opr_uid`)  VALUES ('2', 'get_host_user', 'host_user', 'root', 10, '', '<?xml version="1.0" encoding="UTF-8" ?><env><include_sys_user>0</include_sys_user><user_prefix></user_prefix></env>', 1800, 1, 1,'2014-02-20 15:55:05', '2014-02-20 15:55:05', 1);
+
+
 
 -- -----------------------------
 -- Records of dcmd_task_cmd
