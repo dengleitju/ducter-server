@@ -1,0 +1,37 @@
+#!/bin/sh
+
+echo "begin"
+echo "process=0" > "${DCMD_SVR_RESULT_FILE}"
+echo "sleep 5 second.................."
+sleep 5
+echo "process=10" >> "${DCMD_SVR_RESULT_FILE}"
+echo "sleep 5 second.................."
+sleep 5
+echo "process=20" >> "${DCMD_SVR_RESULT_FILE}"
+echo "sleep 5 second.................."
+sleep 5
+echo "process=30" >> "${DCMD_SVR_RESULT_FILE}"
+echo "sleep 5 second.................."
+sleep 5
+echo "process=40" >> "${DCMD_SVR_RESULT_FILE}"
+echo "sleep 5 second.................."
+sleep 5
+echo "process=50" >> "${DCMD_SVR_RESULT_FILE}"
+echo "sleep 5 second.................."
+sleep 5
+echo "process=60" >> "${DCMD_SVR_RESULT_FILE}"
+echo "sleep 5 second.................."
+sleep 5
+echo "process=70" >> "${DCMD_SVR_RESULT_FILE}"
+echo "sleep 5 second.................."
+sleep 5
+echo "process=80" >> "${DCMD_SVR_RESULT_FILE}"
+echo "sleep 5 second.................."
+sleep 5
+echo "process=90" >> "${DCMD_SVR_RESULT_FILE}"
+echo "sleep 5 second.................."
+sleep 5
+echo "process=100" >> "${DCMD_SVR_RESULT_FILE}"
+echo "state=success">>"${DCMD_SVR_RESULT_FILE}"
+echo "err=">>"${DCMD_SVR_RESULT_FILE}"
+echo "end"

@@ -1,0 +1,237 @@
+package dcmd_api;
+option java_package = "com.cwinux.dcmd";
+import "dcmd_cmn.proto";
+
+message UiTaskOutput {
+  required  int32     client_msg_id=1;
+  required  bytes     subtask_id=2;
+  required  bytes     ip = 3; 
+  required  int32     offset=4; 
+  required  bytes     user=5;
+  required  bytes     passwd=6;
+}
+
+message UiTaskOutputReply {
+  required  int32       client_msg_id=1;
+  required  DcmdState   state = 2;
+  required  bytes       result= 3;
+  required  int32       offset=4;
+  optional  bytes       err=5;
+}
+
+message UiAgentRunningTask {
+  required  int32    client_msg_id=1;
+  optional  bytes    ip=2;
+  optional  bytes    app_name=3;
+  optional  bytes    svr_name=4;
+  optional  bytes    svr_pool=5;
+  required  bytes    user=6;
+  required  bytes    passwd=7;
+}
+
+message UiAgentRunningTaskReply {
+  required  int32       client_msg_id=1;
+  required  DcmdState   state=2;
+  repeated  SubTaskInfo result=3;
+  optional  bytes       err=4;
+}
+
+message UiAgentRunningOpr {
+  required  int32    client_msg_id=1;
+  optional  bytes    ip=2;
+  required  bytes    user=3;
+  required  bytes    passwd=4;
+}
+
+message UiAgentRunningOprReply {
+  required  int32     client_msg_id=1;
+  required  DcmdState state=2;
+  repeated  OprInfo   result=3;
+  optional  bytes     err=4;
+}
+
+
+message UiExecOprCmd {
+  required  int32   client_msg_id=1;
+  optional  bytes   opr_id=2;
+  required  bytes   user=3;
+  required  bytes   passwd=4;
+}
+
+message UiExecOprCmdReply{
+  required  int32            client_msg_id=1;
+  required  DcmdState        state=2;
+  repeated  AgentOprCmdReply result=3;
+  optional  bytes            err=4;
+}
+
+message UiExecDupOprCmd {
+  required  int32    client_msg_id=1;
+  optional  bytes    dup_opr_name=2;
+  repeated  KeyValue args=3;
+  repeated  bytes    agents=4;
+  required  bytes    user=5;
+  required  bytes    passwd=6;
+}
+
+message UiExecDupOprCmdReply{
+  required  int32            client_msg_id=1;
+  required  DcmdState        state=2;
+  repeated  AgentOprCmdReply result=3;
+  optional  bytes            err=4;
+}
+
+message UiAgentInfo {
+  required  int32     client_msg_id=1;
+  repeated  bytes     ips=2;
+  required  bool      version=3;
+  required  bytes     user=4;
+  required  bytes     passwd=5;
+}
+
+message UiAgentInfoReply{
+  required  int32      client_msg_id=1;
+  required  DcmdState  state=2;
+  repeated  AgentInfo  agentinfo=3;
+  optional  bytes      err=4;
+}
+
+message UiInvalidAgentInfo {
+  required  int32  client_msg_id=1;
+  required  bytes  user=2;
+  required  bytes  passwd=3;
+}
+
+message UiInvalidAgentInfoReply{
+  required  int32      client_msg_id=1;
+  required  DcmdState  state=2;
+  repeated  AgentInfo  agentinfo=3;
+  optional  bytes      err=4;
+}
+
+message UiTaskScriptInfo {
+  required  int32  client_msg_id=1;
+  required  bytes  task_cmd=2;
+  required  bytes  user=3;
+  required  bytes  passwd=4;
+}
+
+message UiTaskScriptInfoReply{
+  required  int32     client_msg_id=1;
+  required  DcmdState state=2;
+  optional  bytes     script=3;
+  optional  bytes     err=4;
+  optional  bytes     md5=5;
+}
+
+message UiOprScriptInfo {
+  required  int32  client_msg_id=1;
+  required  bytes  opr_file=2;
+  required  bytes  user=3;
+  required  bytes  passwd=4;
+}
+
+message UiOprScriptInfoReply{
+  required  int32     client_msg_id=1;
+  required  DcmdState state=2;
+  optional  bytes     script=3;
+  optional  bytes     err=4;
+  optional  bytes     md5=5;
+}
+
+message UiScriptInfo {
+  required  int32  client_msg_id=1;
+  required  bytes  script_file=2;
+  required  UiScriptType script_type=3;
+  required  bytes  user=4;
+  required  bytes  passwd=5;
+}
+
+message UiScriptInfoReply{
+  required  int32     client_msg_id=1;
+  required  DcmdState state=2;
+  optional  bytes     script=3;
+  optional  bytes     err=4;
+  optional  bytes     md5=5;
+}
+
+message UiScripts {
+  required  int32   client_msg_id=1;
+  required  UiScriptType   script_type=2;
+  required  bytes   script_prefix=3;
+  required  int32   fetch_num=4;
+  required  bytes   user=5;
+  required  bytes   passwd=6;
+}
+
+message UiScriptsReply{
+  required  int32     client_msg_id=1;
+  required  DcmdState state=2;
+  repeated  bytes     scripts=3;
+  optional  bytes     err=4;
+}
+
+message UiAgentTaskProcess {
+  required  int32  client_msg_id=1;
+  repeated  bytes  subtask_id =2;
+  required  bytes  user=3;
+  required  bytes  passwd=4;
+}
+
+message UiAgentTaskProcessReply{
+  required  int32     client_msg_id=1;
+  required  DcmdState state=2;
+  repeated  SubTaskProcess process = 3;
+  optional  bytes     err=4;
+}
+
+
+message UiTaskCmd {
+  required  int32  client_msg_id=1;
+  required  bytes  task_id =2;
+  required  int32  uid = 3;
+  optional  bytes  subtask_id=4;
+  optional  bytes  ip=5;
+  optional  bytes  svr_name=6;
+  optional  bytes  svr_pool=7;
+  optional  int32  concurrent_rate=9;
+  optional  int32  task_timeout=10;
+  optional  bool   auto=11;
+  required  CmdType cmd_type = 12;
+  required  bytes  user=13;
+  required  bytes  passwd=14;
+}
+
+message UiTaskCmdReply{
+  required  int32     client_msg_id=1;
+  required  DcmdState state=2;
+  optional  bytes     err=4;
+}
+
+message UiAgentHostName {
+  required  int32  client_msg_id=1;
+  required  bytes  agent_ip =2;
+  required  bytes  user=3;
+  required  bytes  passwd=4;
+}
+
+message UiAgentHostNameReply{
+  required  int32       client_msg_id=1;
+  required  DcmdState   state=2;
+  required  bool        is_exist=3;
+  required  bytes       hostname=4;
+  optional  bytes       err=5;
+}
+
+message UiAgentValid {
+  required  int32  client_msg_id=1;
+  required  bytes  agent_ip =2;
+  required  bytes  user=3;
+  required  bytes  passwd=4;
+}
+
+message UiAgentValidReply{
+  required  int32       client_msg_id=1;
+  required  DcmdState   state=2;
+  optional  bytes       err=3;
+}

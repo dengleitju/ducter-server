@@ -1,0 +1,14 @@
+#!/bin/sh
+if [ "$DCMD_OPR_include_sys_user" != "1" ]; then
+  if [ -z "$DCMD_OPR_user_prefix" ]; then
+    cat /etc/passwd | awk -F: '$3>=500' | cut -f 1 -d:
+  else
+    cat /etc/passwd | awk -F: '$3>=500' | cut -f 1 -d:|grep ^"$DCMD_OPR_user_prefix"
+  fi
+else
+  if [ -z "$DCMD_OPR_user_prefix" ]; then
+    cat /etc/passwd | cut -f 1 -d :
+  else
+    cat /etc/passwd | cut -f 1 -d :|grep ^"$DCMD_OPR_user_prefix"
+  fi
+fi

@@ -1,0 +1,16 @@
+##install cwinux library
+#download cwinux2.3.2.tar.gz from http://cwinux.googlecode.com/files/cwinux2.3.2.tar.gz
+wget http://cwinux.googlecode.com/files/cwinux2.3.2.tar.gz
+tar xvfz cwinux2.3.2.tar.gz
+cd cwinux2.3.3
+configure --with-prefix=install path
+make
+make install
+
+##install unistor
+wget http://cwx-kv.googlecode.com/files/unistor1.0.0.tar.gz
+tar xvfz unistor1.0.0.tar.gz
+cd unistor1.0.0
+configure  --with-prefix=install path --with-prefix=install path --with-zk=zk path  --with-openssl=openssl path
+make
+make install

@@ -1,0 +1,347 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*- 
+
+#install path
+#--base_path/project/service[/service_pool]: #if [node_multi_pool==1],then [service_pool] is used.
+#                     |--bin  --->service's bin path
+#                     |       |--start.sh  --->start service
+#                     |       |--stop.sh   --->stop service
+#                     |       |--install.sh --->install service
+#                     |--other path    -->other path for service
+#                     |--.install
+#                     |     |--version  --->service's version file for running
+#                     |     |--env_conf --->service's pool's env conf
+#                     |     |--package  --->history package path
+#                     |     |    |--project_service_version.tar.gz
+#                     |     |--tmp  --->temporary path
+
+import os
+import commands
+import shutil
+import sys
+import traceback
+import datetime
+import platform
+
+RESERVE_PACKAGE_NUM = 5
+
+
+class DcmdInstall():
+  def __init__(self):
+    #get environ var
+    self.app_name_ = os.environ.get('DCMD_APP_NAME')
+    self.svr_name_ = os.environ.get('DCMD_SVR_NAME')
+    self.svr_pool_ = os.environ.get('DCMD_SVR_POOL')
+    self.svr_version_ = os.environ.get('DCMD_SVR_VERSION')
+    self.svr_repo_ = os.environ.get('DCMD_SVR_REPO')
+    self.svr_user_ = os.environ.get('DCMD_SVR_USER')
+    self.svr_ip_ = os.environ.get('DCMD_SVR_IP')
+    self.is_svr_update_env_ = True if "1"== os.environ.get('DCMD_SVR_UPDATE_ENV') else False
+    self.is_svr_update_tag_ = True if "1"== os.environ.get('DCMD_SVR_UPDATE_TAG') else False
+    self.is_node_multi_pool_ = True if "1"== os.environ.get('DCMD_SVR_NODE_MUTIL_POOL') else False
+    self.is_svr_process_ = True if "1"== os.environ.get('DCMD_SVR_PROCESS') else False
+    self.svr_env_v_ = os.environ.get('DCMD_SVR_ENV_V')
+    self.svn_user_ = os.environ.get('DCMD_TASK_svn_user')
+    self.svn_passwd_ = os.environ.get('DCMD_TASK_svn_passwd')
+    self.is_merge_ = True if "1"== os.environ.get('DCMD_TASK_is_merge') else False
+    self.is_os_package_ = True if "1"== os.environ.get('DCMD_TASK_is_os_package') else False
+    self.svr_result_file_ = os.environ.get('DCMD_SVR_RESULT_FILE')
+    self.svr_home_ = os.path.join(os.environ.get('DCMD_SVR_PATH'), self.app_name_)
+    self.svr_home_ = os.path.join(self.svr_home_, self.svr_name_)
+    if self.is_node_multi_pool_:
+      self.svr_home_ = os.path.join(self.svr_home_, self.svr_pool_)
+    self.install_path_ = os.path.join(self.svr_home_, ".install")
+    self.svr_package_path_ = os.path.join(self.install_path_, "package")
+    self.svr_version_file_ = os.path.join(self.install_path_, "version")
+    self.svr_env_conf_path_ = os.path.join(self.install_path_, "env_conf")
+    self.svr_env_conf_version_path_ = os.path.join(self.svr_env_conf_path_, self.svr_env_v_)
+    self.svr_tmp_path_ = os.path.join(self.install_path_, "tmp")
+    self.svr_tmp_service_path_ = os.path.join(self.svr_tmp_path_, self.svr_name_)
+    self.svr_online_version_ = ""
+    self.svr_packages_ = []
+    self.install_errmsg_ = ""
+    self.install_success_ = False
+    self.os_platform_ = ""
+    self.svr_package_ = ""
+
+  def clean_path(self, path):
+    print("Clear path:%s" % path)
+    package_files = os.listdir(path)
+    for f in package_files:
+      rm_file = os.path.join(path, f)
+      self._remove(rm_file)
+  def remove_old_package(self):
+    print("Remove old package file...............")
+    package_files = os.listdir(self.svr_package_path_)
+    packages = []
+    for f in package_files:
+      if os.path.isdir(f): ##delete path in package path
+        rm_file = os.path.join(self.svr_package_path_, f)
+        shutil.rmtree(rm_file)
+        continue
+      statinfo=os.stat(os.path.join(self.svr_package_path_, f))
+      packages.append(((int)(statinfo.st_ctime), f))
+    packages.sort(lambda x,y:cmp(x[0],y[0]))
+    while len(packages) > RESERVE_PACKAGE_NUM:
+      self._remove(self.svr_package_path_, packages[0][1])
+      del packages[0]
+
+  #init the service path
+  def init_service_env(self):
+    print("Get host's os")
+    os_type = platform.platform()
+    if "centos" in os_type:
+      self.os_platform_ = "centos"
+    elif "Ubuntu" in os_type:
+      self.os_platform_ = "ubuntu"
+    elif "redhat" in os_type:
+      self.os_platform_ = "redhat"
+    else:
+      print("Unsupport os type: %s" % os_type)
+      raise Exception("Unsupport os type: %s" % os_type)
+    if "64bit" == platform.architecture()[0]:
+        self.os_platform_ += "64"
+    else:
+        self.os_platform_ += "32"
+    print("OS type:%s" % self.os_platform_)
+
+    if self.is_os_package_:
+      self.svr_package_ = self.svr_name_ + "_" + self.os_platform_ + "_" + self.svr_version_ + ".tar.gz"
+    else:
+      self.svr_package_ = self.svr_name_ + "_"  + self.svr_version_ + ".tar.gz"
+
+    print("Check service home:%s" % self.svr_home_)
+    self._check_and_mk_missed_path(self.svr_home_)
+    print("Check service package path:%s" % self.svr_package_path_)
+    self._check_and_mk_missed_path(self.svr_package_path_)
+    print("Check service tmp path:%s" % self.svr_tmp_path_)
+    self._check_and_mk_missed_path(self.svr_tmp_path_)
+    print("Check env conf path:%s" % self.svr_env_conf_path_)
+    self._check_and_mk_missed_path(self.svr_env_conf_path_)
+
+    self.clean_path(self.svr_tmp_path_)
+    self.clean_path(self.svr_env_conf_path_)
+    self.remove_old_package()
+    
+  #check current version
+  def check_version(self):
+    print("Check service [%s]'s version....." % self.svr_name_)
+    if os.path.isfile(self.svr_version_file_):
+      print("Version file exists, file:%s." % self.svr_version_file_)
+      with open(self.svr_version_file_, 'r') as f:
+        self.svr_online_version_ = f.read()
+        print("Online version is:%s" % self.svr_online_version_)
+        if self.svr_online_version_ == self.svr_version_:
+          print("Version is same, version:%s" % self.svr_version_)
+          return True
+        else:
+          print("Version is not same, running version:%s, install version:%s" % (self.svr_online_version_, self.svr_version_))
+          return False
+    print("Version file doesn't exist, version file:%s" % self.svr_version_file_)
+    return False
+  
+  #create version file to save version
+  def create_version_file(self):
+    print("Save version[%s] to %s" % (self.svr_version_, self.svr_version_file_))
+    with open(self.svr_version_file_, 'w') as f:
+      f.write(self.svr_version_)
+  
+  #remove current version file
+  def remove_version_file(self):
+    print("Remove current verision file:%s" % self.svr_version_file_)
+    self._remove(self.svr_version_file_)
+
+  #out result to out_file
+  def output_result(self):
+    if self.install_success_:
+      with open(self.svr_result_file_, 'w') as f:
+        f.write("state=success\n")
+        f.write("err=")
+    else:
+      with open(self.svr_result_file_, 'w') as f:
+        f.write("state=failure\n")
+        f.write("err=%s" % self.install_errmsg_)
+
+  #download service package
+  def download_package(self):
+    save_file = os.path.join(self.svr_package_path_, self.svr_package_)
+    tmp_file = os.path.join(self.svr_tmp_path_, self.svr_package_)
+    is_download = True
+    if os.path.isfile(save_file):
+      if not self.is_svr_update_tag_:
+        print("Pachage file:%s exist, doesn't download" % self.svr_package_)
+        shutil.copyfile(save_file, tmp_file)
+        is_download = False
+      else:
+        self._remove(save_file)
+    if is_download:
+      if os.path.isfile(tmp_file):
+          self._remove(tmp_file)
+      download_path_file = self.svr_repo_ + "/packages/" + self.app_name_ + "/" + self.svr_name_ + "/"  + self.svr_package_
+      print("svn package file:%s" % download_path_file)
+      if (self.svn_user_ and self.svn_passwd_):
+        svn_cmd = "svn export %s %s --username=%s --password=%s --no-auth-cache --non-interactive " % (download_path_file, os.path.join(self.svr_tmp_path_,self.svr_package_), self.svn_user_, self.svn_passwd_)
+      elif (self.svn_user_):
+        svn_cmd = "svn export %s %s --username=%s --no-auth-cache --non-interactive " % (download_path_file, os.path.join(self.svr_tmp_path_,self.svr_package_), self.svn_user_)
+      else:
+        svn_cmd = "svn export %s %s --no-auth-cache --non-interactive " % (download_path_file, os.path.join(self.svr_tmp_path_,self.svr_package_))
+      if not self._run_cmd(svn_cmd):
+        self.install_errmsg_ = "Failure to download package, cmd:%s" % svn_cmd
+        self.install_success_ = False
+        return False
+      shutil.copy(tmp_file, save_file)
+    if os.path.isdir(self.svr_tmp_service_path_):
+      self._remove(self.svr_tmp_service_path_)
+    unzip_cmd = "tar -zxvf " + tmp_file + " -C " + self.svr_tmp_path_
+    if not self._run_cmd(unzip_cmd):
+      self.install_errmsg_ = "Failure to unpack package:%s" % tmp_file
+      self.install_success_ = False
+      return False
+    remove_cmd = "rm -f %s" % tmp_file
+    if not self._run_cmd(remove_cmd):
+      self.install_errmsg_ = "Failure to remove tmp package:%s" % tmp_file
+      self.install_success_ = False
+      return False
+    #find app's home path
+    if not os.path.isdir(self.svr_tmp_service_path_):
+      self.install_errmsg_ = "package's extract-path must be service'name"
+      self.install_success_ = False
+    return True
+
+  #download service config
+  def download_config(self):
+    if not self.is_svr_update_env_:
+      print("Needn't download env config")
+      return True
+    print("tmp_conf_path:%s" % self.svr_env_conf_path_)
+    if os.path.isdir(self.svr_env_conf_version_path_):
+      os.rmdir(self.svr_env_conf_version_path_)
+    # download conf from svn
+    svn_path = self.svr_repo_ + "/conf" + "/" + self.app_name_ + "/" + self.svr_name_ + "/" + self.svr_pool_ + "/" + self.svr_env_v_
+    print("svn env-config path:%s" % svn_path)
+    if (self.svn_user_ and self.svn_passwd_):
+      svn_cmd = "svn export %s %s --username=%s --password=%s --no-auth-cache --non-interactive " % (svn_path, self.svr_env_conf_version_path_, self.svn_user_, self.svn_passwd_)
+    elif (self.svn_user_):
+      svn_cmd = "svn export %s %s --username=%s --no-auth-cache --non-interactive " % (svn_path, self.svr_env_conf_version_path_, self.svn_user_)
+    else:
+      svn_cmd = "svn export %s %s --no-auth-cache --non-interactive " % (svn_path, self.svr_env_conf_version_path_)
+    if not self._run_cmd(svn_cmd):
+      self.install_success_ = False
+      self.install_errmsg_ = "Failed to get conf from svn:%s, cmd:%s" % (svn_path, svn_cmd)
+      return False
+    return True
+
+  #start service
+  def start_service(self):
+    start_cmd = os.path.join(os.path.join(self.svr_home_,"bin"), "start.sh")
+    if not self._run_cmd(start_cmd):
+      self.install_success_ = False
+      self.install_errmsg_ = "Failed to start service, cmd:%s" % start_cmd
+      return False
+    return True
+
+  #stop service
+  def stop_service(self):
+    stop_cmd = os.path.join(os.path.join(self.svr_home_,"bin"), "stop.sh")
+    if not os.path.isfile(stop_cmd): return True
+    if not self._run_cmd(stop_cmd):
+      self.install_success_ = False
+      self.install_errmsg_ = "Failed to stop service, cmd:%s" % stop_cmd
+      return False
+    return True
+
+  #install service
+  def install_service(self):
+    install_cmd = os.path.join(os.path.join(self.svr_tmp_service_path_,"bin"), "install.sh")
+    change_mod = "chmod 755 " + install_cmd
+    if not self._run_cmd(change_mod):
+      self.install_success_ = False
+      self.install_errmsg_ = "Failed to change install's mod, cmd:%s" % change_mod
+      return False
+    if self.is_svr_update_env_:
+      install_cmd = install_cmd + " "  + self.svr_home_ + " " + self.svr_tmp_service_path_ + " "  + self.svr_env_conf_version_path_
+    else:
+      install_cmd = install_cmd + " "  + self.svr_home_ + " " + self.svr_tmp_service_path_
+    if not self._run_cmd(install_cmd):
+      self.install_success_ = False
+      self.install_errmsg_ = "Failed to install service, cmd:%s" % install_cmd
+      return False
+    return True
+
+  #remove file or dir
+  def _remove(self, df):
+    if os.path.isfile(df):
+      os.remove(df)
+    elif os.path.isdir(df):
+      shutil.rmtree(df)
+
+  #check and create missing subpath
+  def _check_and_mk_missed_path(self, path):
+    if not os.path.isdir(path):
+      os.makedirs(path)
+
+  #runing system cmd
+  def _run_cmd(self, cmd):
+    ret = os.system(cmd)
+    ret >>= 8
+    return ret == 0
+
+def main():
+  install = DcmdInstall()
+  #1.check version
+  try:
+    print("\n%s:STEP 0: init svr enviroment.......\n" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    install.init_service_env()
+
+    print("\n%s:STEP 1: Check version.............\n" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    if install.check_version() and not install.is_svr_update_tag_:
+      print "==>The package version to be installed is same as current versionm, install succeed."
+      install.install_success_ = True
+      install.output_result()
+      return
+  
+
+    print("\n%s:STEP 2: Download package............\n" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    if not install.download_package():
+      install.output_result()
+      return
+      
+    print("\n%s:STEP 3: Download config file.........\n" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    if not install.download_config():
+      install.output_result()
+      return
+
+    print("\n%s:STEP 4: Stop current service........\n" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    if not install.stop_service():
+      install.output_result()
+      return
+
+    print("\n%s:STEP 5: Remove version file............\n" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    install.remove_version_file()
+
+    print("\n%s:STEP 6: Install service..............\n" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    if not install.install_service():
+      install.output_result()
+      return
+
+    print("\n%s:STEP 7: Start service...............\n" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    if not install.start_service():
+      install.output_result()
+      return
+
+    print("\n%s:STEP 8: Create service version file............\n" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    install.create_version_file()
+
+    print("%s:Success to install serivice.\n" % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    install.install_success_ = True
+  except Exception, e:
+    print ("%s:Failed to install, Exception:%s" % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), e))
+    traceback.print_exc()
+    install.install_errmsg_ = "Failed to install for exception: %s" % e
+    install.install_success_ = False
+ 
+  install.output_result()
+  
+  
+if __name__ == "__main__":
+  main()
