@@ -1,0 +1,19 @@
+#!/bin/sh
+proc_path="/proc/""$DCMD_OPR_path"
+if [ -f $proc_path ]; then
+  if [ -z "$DCMD_OPR_filter" ]; then
+    cat $proc_path
+  else
+    cat $proc_path|grep "$DCMD_OPR_filter"
+  fi
+elif [ -d $proc_path ]; then
+  if [ -z "$DCMD_OPR_filter" ]; then
+    ls -1X $proc_path
+  else
+    ls -1X $proc_path|grep "$DCMD_OPR_filter"
+  fi
+else
+ echo "Doesn't exist."
+ exit 1
+fi
+exit 0

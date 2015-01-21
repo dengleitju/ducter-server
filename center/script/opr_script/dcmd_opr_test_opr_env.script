@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "The enviroment variable is following:"
+
+set|grep DCMD
