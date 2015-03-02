@@ -464,6 +464,7 @@ CREATE TABLE `dcmd_task_service_pool` (
   `utime` datetime NOT NULL,
   `ctime` datetime NOT NULL,
   `opr_uid` int(10) unsigned NOT NULL,
+  `state` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_task_id_svr_pool_id` (`task_id`,`svr_pool_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8;
