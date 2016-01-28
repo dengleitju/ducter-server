@@ -1176,5 +1176,5 @@ INSERT INTO `dcmd_opr_cmd_repeat_exec` (`repeat_cmd_id`, `repeat_cmd_name`, `opr
 -- -----------------------------
 INSERT INTO `dcmd_task_cmd` (`task_cmd_id`, `task_cmd`,  `ui_name`, `script_md5`, `timeout`, `comment`, `utime`, `ctime`, `opr_uid`, `ui_name`) VALUES (1, 'test_process', 'test_process', 'eee6d3932d4e082d3850b9ec30e68c91', 1800, '用于测试dcmd进度显示', '2014-12-27 10:56:00', '2014-12-27 10:56:00', 1, '进度测试任务脚本');
 INSERT INTO `dcmd_task_cmd` (`task_cmd_id`, `task_cmd`,  `ui_name`, `script_md5`, `timeout`, `comment`, `utime`, `ctime`, `opr_uid`, `ui_name`) VALUES (2, 'test_task_env', 'test_task_env', '1c737d825d3f88174d637bf1ac8dffde', 100, '测试task环境变量', '2014-12-27 10:56:00', '2014-12-27 10:56:00', 1, '进度Task环境变量');
-INSERT INTO `dcmd_task_cmd` (`task_cmd_id`, `task_cmd`,  `ui_name`, `script_md5`, `timeout`, `comment`, `utime`, `ctime`, `opr_uid`, `ui_name`) VALUES (3, 'install_by_svn', 'install_by_svn', '4f2d5b646166939bcbd5a6da6f042b42', 1000, '', '2014-12-27 10:56:00', '2014-12-27 10:56:00', 1, 'install_by_svn');
+INSERT INTO `dcmd_task_cmd` (`task_cmd_id`, `task_cmd`,  `ui_name`, `script_md5`, `timeout`, `comment`, `utime`, `ctime`, `opr_uid`, `ui_name`) VALUES (3, 'install_by_svn',  'install_by_svn', '4f2d5b646166939bcbd5a6da6f042b42', 1000, '', '2014-12-27 10:56:00', '2014-12-27 10:56:00', 1, 'install_by_svn');
 
